@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Smart Study Planner</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary:  { DEFAULT: '#2563EB', light: '#3B82F6', dark: '#1D4ED8' },
+            accent:   { DEFAULT: '#F97316', light: '#FB923C', dark: '#EA580C' },
+            surface:  '#F8FAFC',
+            card:     '#FFFFFF',
+          },
+          fontFamily: { sans: ['"Inter"', 'system-ui', 'sans-serif'] },
+          boxShadow: {
+            card: '0 2px 12px 0 rgba(37,99,235,0.07)',
+            'card-hover': '0 6px 24px 0 rgba(37,99,235,0.14)',
+          },
+        }
+      }
+    }
+  </script>
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="bg-surface font-sans text-gray-800 min-h-screen">
+
+  <!-- ===== HEADER / NAVBAR ===== -->
+  <header class="bg-primary text-white shadow-md sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
+      <div class="flex items-center gap-3">
+        <span class="text-2xl">📚</span>
+        <span class="text-xl font-bold tracking-tight">Smart Study Planner</span>
+      </div>
+      <!-- Mobile menu toggle -->
+      <button id="navToggle" class="sm:hidden focus:outline-none" aria-label="Menu">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M4 6h16M4 12h16M4 18h16"/>
+        </svg>
+      </button>
+      <!-- Desktop nav -->
+      <nav class="hidden sm:flex gap-6 text-sm font-medium">
+        <a href="#dashboard"  class="nav-link hover:text-accent transition">Dashboard</a>
+        <a href="#tasks"      class="nav-link hover:text-accent transition">Tugas</a>
+        <a href="#schedule"   class="nav-link hover:text-accent transition">Jadwal</a>
+        <a href="#timer"      class="nav-link hover:text-accent transition">Timer</a>
+        <a href="#notes"      class="nav-link hover:text-accent transition">Catatan</a>
+        <a href="#assistant"  class="nav-link hover:text-accent transition">Asisten</a>
+      </nav>
+    </div>
+    <!-- Mobile nav dropdown -->
+    <nav id="mobileNav" class="hidden sm:hidden bg-primary-dark px-4 pb-4 flex flex-col gap-3 text-sm font-medium">
+      <a href="#dashboard"  class="hover:text-accent transition">Dashboard</a>
+      <a href="#tasks"      class="hover:text-accent transition">Tugas</a>
+      <a href="#schedule"   class="hover:text-accent transition">Jadwal</a>
+      <a href="#timer"      class="hover:text-accent transition">Timer</a>
+      <a href="#notes"      class="hover:text-accent transition">Catatan</a>
+      <a href="#assistant"  class="hover:text-accent transition">Asisten</a>
+    </nav>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-12">
+
+    <!-- ===== SECTION 1: DASHBOARD ===== -->
+    <section id="dashboard">
+      <h2 class="section-title">📊 Dashboard</h2>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
+        <div class="stat-card bg-primary text-white">
+          <p class="stat-label">Total Tugas</p>
+          <p id="statTotal" class="stat-value">0</p>
+        </div>
+        <div class="stat-card bg-accent text-white">
+          <p class="stat-label">Selesai</p>
+          <p id="statDone" class="stat-value">0</p>
+        </div>
+        <div class="stat-card bg-white border border-gray-200">
+          <p class="stat-label text-gray-500">Belum Selesai</p>
+          <p id="statPending" class="stat-value text-primary">0</p>
+        </div>
+        <div class="stat-card bg-white border border-gray-200">
+          <p class="stat-label text-gray-500">Progres</p>
+          <p id="statPercent" class="stat-value text-accent">0%</p>
+        </div>
+      </div>
+      <!-- Progress Bar -->
+      <div class="mt-6 bg-white rounded-2xl shadow-card p-5">
+        <div class="flex justify-between items-center mb-2">
+          <span class="font-semibold text-gray-700">Progress Belajar</span>
+          <span id="progressLabel" class="text-sm font-bold text-primary">0%</span>
+        </div>
+        <div class="w-full bg-gray-100 rounded-full h-4 overflow-hidden">
+          <div id="progressBar" class="progress-bar h-4 rounded-full transition-all duration-500" style="width:0%"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== SECTION 2: TASK MANAGEMENT ===== -->
+    <section id="tasks">
+      <h2 class="section-title">✅ Manajemen Tugas</h2>
+
+      <!-- Add Task Form -->
+      <div class="bg-white rounded-2xl shadow-card p-5 mt-4">
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <input id="taskInput" type="text" placeholder="Nama tugas..."
+            class="input-field sm:col-span-2" />
+          <select id="taskPriority" class="input-field">
+            <option value="low">🟢 Prioritas Rendah</option>
+            <option value="medium" selected>🟡 Prioritas Sedang</option>
+            <option value="high">🔴 Prioritas Tinggi</option>
+          </select>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-3">
+          <input id="taskDeadline" type="date" class="input-field" />
+          <input id="taskSubject" type="text" placeholder="Mata kuliah (opsional)..." class="input-field" />
+          <button onclick="addTask()" class="btn-primary">+ Tambah Tugas</button>
+        </div>
+      </div>
+
+      <!-- Filter Buttons -->
+      <div class="flex gap-2 mt-4 flex-wrap">
+        <button onclick="setFilter('all')"       id="filter-all"       class="filter-btn filter-active">Semua</button>
+        <button onclick="setFilter('active')"    id="filter-active"    class="filter-btn">Aktif</button>
+        <button onclick="setFilter('completed')" id="filter-completed" class="filter-btn">Selesai</button>
+      </div>
+
+      <!-- Task List -->
+      <div id="taskList" class="mt-4 space-y-3"></div>
+      <p id="emptyTasks" class="text-center text-gray-400 mt-6 hidden">Tidak ada tugas. Tambahkan tugas baru! 🎯</p>
+    </section>
+
+    <!-- ===== SECTION 3: JADWAL BELAJAR ===== -->
+    <section id="schedule">
+      <h2 class="section-title">📅 Jadwal Belajar</h2>
+      <div class="bg-white rounded-2xl shadow-card p-5 mt-4">
+        <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
+          <input id="schedSubject" type="text"  placeholder="Nama mata kuliah..."  class="input-field sm:col-span-2" />
+          <input id="schedDate"    type="date"  class="input-field" />
+          <input id="schedTime"    type="time"  class="input-field" />
+        </div>
+        <div class="mt-3">
+          <input id="schedNote" type="text" placeholder="Catatan singkat (opsional)..." class="input-field w-full" />
+        </div>
+        <button onclick="addSchedule()" class="btn-primary mt-3">+ Tambah Jadwal</button>
+      </div>
+      <!-- Schedule List -->
+      <div id="scheduleList" class="mt-4 space-y-3"></div>
+      <p id="emptySchedule" class="text-center text-gray-400 mt-6 hidden">Belum ada jadwal belajar. 📆</p>
+    </section>
+
+    <!-- ===== SECTION 4: STUDY TIMER ===== -->
+    <section id="timer">
+      <h2 class="section-title">⏱️ Study Timer</h2>
+      <div class="bg-white rounded-2xl shadow-card p-8 mt-4 flex flex-col items-center gap-6">
+        <!-- Timer mode tabs -->
+        <div class="flex gap-2">
+          <button onclick="setTimerMode('pomodoro')" id="mode-pomodoro" class="timer-mode-btn timer-mode-active">Pomodoro (25m)</button>
+          <button onclick="setTimerMode('short')"    id="mode-short"    class="timer-mode-btn">Istirahat Pendek (5m)</button>
+          <button onclick="setTimerMode('long')"     id="mode-long"     class="timer-mode-btn">Istirahat Panjang (15m)</button>
+        </div>
+        <!-- Clock display -->
+        <div class="relative flex items-center justify-center">
+          <svg class="timer-ring" viewBox="0 0 120 120" width="200" height="200">
+            <circle cx="60" cy="60" r="54" class="timer-track" />
+            <circle id="timerCircle" cx="60" cy="60" r="54" class="timer-progress" />
+          </svg>
+          <span id="timerDisplay" class="absolute text-5xl font-bold text-primary tabular-nums">25:00</span>
+        </div>
+        <!-- Controls -->
+        <div class="flex gap-4">
+          <button id="btnStart" onclick="startTimer()"  class="btn-primary w-28">▶ Mulai</button>
+          <button id="btnPause" onclick="pauseTimer()"  class="btn-outline w-28 hidden">⏸ Jeda</button>
+          <button          onclick="resetTimer()"  class="btn-secondary w-28">↺ Reset</button>
+        </div>
+        <!-- Session counter -->
+        <p class="text-sm text-gray-500">Sesi Pomodoro selesai: <span id="pomodoroCount" class="font-bold text-accent">0</span></p>
+      </div>
+    </section>
+
+    <!-- ===== SECTION 5: CATATAN BELAJAR ===== -->
+    <section id="notes">
+      <h2 class="section-title">📝 Catatan Belajar</h2>
+      <div class="bg-white rounded-2xl shadow-card p-5 mt-4">
+        <input id="noteTitle" type="text" placeholder="Judul catatan..." class="input-field w-full mb-3" />
+        <textarea id="noteContent" rows="4" placeholder="Tulis catatan di sini..."
+          class="input-field w-full resize-none"></textarea>
+        <button onclick="addNote()" class="btn-primary mt-3">+ Simpan Catatan</button>
+      </div>
+      <!-- Notes Grid -->
+      <div id="notesList" class="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+      <p id="emptyNotes" class="text-center text-gray-400 mt-6 hidden">Belum ada catatan. Mulai tulis sekarang! ✍️</p>
+    </section>
+
+    <!-- ===== SECTION 6: STUDY ASSISTANT ===== -->
+    <section id="assistant">
+      <h2 class="section-title">🤖 Study Assistant</h2>
+      <p class="text-sm text-gray-500 mt-1">Tanyakan apa saja tentang tugas, jadwal, dan progres belajarmu.</p>
+
+      <div class="bg-white rounded-2xl shadow-card mt-4 flex flex-col" style="height:520px;">
+
+        <!-- Chat messages area -->
+        <div id="chatMessages" class="flex-1 overflow-y-auto p-5 space-y-4">
+          <!-- Welcome bubble from assistant -->
+          <div class="chat-bubble-wrap assistant">
+            <div class="chat-avatar">🤖</div>
+            <div class="chat-bubble assistant-bubble">
+              <p>Halo! Saya <strong>Study Assistant</strong> kamu. 👋</p>
+              <p class="mt-1 text-sm opacity-80">Saya dapat membaca data tugas, jadwal, dan progresmu secara langsung. Coba tanyakan sesuatu, atau pilih salah satu pertanyaan cepat di bawah!</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick prompt chips -->
+        <div id="quickPrompts" class="px-4 py-2 flex gap-2 flex-wrap border-t border-gray-100">
+          <button class="quick-chip" onclick="sendQuick('Tugas apa yang harus saya kerjakan lebih dulu?')">📋 Prioritas tugas</button>
+          <button class="quick-chip" onclick="sendQuick('Tampilkan tugas dengan deadline paling dekat.')">📅 Deadline terdekat</button>
+          <button class="quick-chip" onclick="sendQuick('Berapa tugas saya yang belum selesai?')">📊 Ringkasan progres</button>
+          <button class="quick-chip" onclick="sendQuick('Bantu saya menyusun jadwal belajar hari ini.')">🗓️ Jadwal hari ini</button>
+          <button class="quick-chip" onclick="sendQuick('Berikan motivasi belajar hari ini.')">💪 Motivasi</button>
+        </div>
+
+        <!-- Input row -->
+        <div class="p-4 border-t border-gray-100 flex gap-3 items-end">
+          <textarea id="chatInput" rows="1" placeholder="Ketik pertanyaanmu di sini… (Enter untuk kirim)"
+            class="input-field flex-1 resize-none chat-input"></textarea>
+          <button onclick="sendChat()" id="chatSendBtn"
+            class="btn-primary flex-shrink-0 h-10 w-10 !p-0 flex items-center justify-center rounded-xl" title="Kirim">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+            </svg>
+          </button>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ===== EDIT TASK MODAL ===== -->
+  <div id="editModal" class="modal-overlay hidden">
+    <div class="modal-box">
+      <h3 class="text-lg font-bold text-gray-800 mb-4">✏️ Edit Tugas</h3>
+      <input id="editTaskInput"    type="text" placeholder="Nama tugas..."  class="input-field w-full mb-3" />
+      <select id="editTaskPriority" class="input-field w-full mb-3">
+        <option value="low">🟢 Prioritas Rendah</option>
+        <option value="medium">🟡 Prioritas Sedang</option>
+        <option value="high">🔴 Prioritas Tinggi</option>
+      </select>
+      <input id="editTaskDeadline"  type="date" class="input-field w-full mb-3" />
+      <input id="editTaskSubject"   type="text" placeholder="Mata kuliah..." class="input-field w-full mb-5" />
+      <div class="flex gap-3 justify-end">
+        <button onclick="closeModal()" class="btn-secondary">Batal</button>
+        <button onclick="saveEditTask()" class="btn-primary">Simpan</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== EDIT NOTE MODAL ===== -->
+  <div id="editNoteModal" class="modal-overlay hidden">
+    <div class="modal-box">
+      <h3 class="text-lg font-bold text-gray-800 mb-4">✏️ Edit Catatan</h3>
+      <input id="editNoteTitle"   type="text" placeholder="Judul..."      class="input-field w-full mb-3" />
+      <textarea id="editNoteContent" rows="5" placeholder="Isi catatan..." class="input-field w-full resize-none mb-5"></textarea>
+      <div class="flex gap-3 justify-end">
+        <button onclick="closeNoteModal()" class="btn-secondary">Batal</button>
+        <button onclick="saveEditNote()"   class="btn-primary">Simpan</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== TOAST NOTIFICATION ===== -->
+  <div id="toast" class="toast hidden"></div>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="mt-16 py-6 text-center text-sm text-gray-400 border-t border-gray-200">
+    Smart Study Planner &copy; 2025 &mdash; Dibuat untuk mahasiswa produktif 🚀
+  </footer>
+
+  <!-- Main Script -->
+  <script src="script.js"></script>
+</body>
+</html>
